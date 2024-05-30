@@ -19,9 +19,9 @@ export default function Home() {
 
       <div>
 
-        <button type="button" className="bg-blue-800/30 text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl">
+        <a href="/play" className="bg-blue-800/30 text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl">
           Start Game
-        </button>
+        </a>
 
       </div>
     </main>

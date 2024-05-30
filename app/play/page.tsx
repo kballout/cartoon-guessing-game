@@ -46,7 +46,7 @@ export default function About({ }: Props) {
 
 
 
-      <div className="absolute bg-white/90 w-1/2 h-5/6 rounded-lg px-8 py-6 flex flex-col ">
+      <div className="absolute bg-white/90 w-1/2 h-5/6 rounded-lg px-8 py-6 flex flex-col hidden">
         <div className="font-bold text-4xl text-center border-b-2 border-b-slate-800 mb-8">GAME OVER</div>
         <div className="flex-1">
         <div className="text-xl">
