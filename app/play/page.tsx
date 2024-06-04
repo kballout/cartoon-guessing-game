@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import chars from "../../characters.json";
 import Image from "next/image";
 import { Character, Option, VALIDATION, ANSWERFEEDBACKIMAGE } from "../types";
@@ -8,17 +8,17 @@ type Props = {};
 
 export default function About({}: Props) {
   const WINSCORE = 25;
+  const INITALTIME = 10;
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [incorrect, setIncorrect] = useState(0);
   const [allPictures, setAllPictures] = useState<Array<Character>>(
     shuffle(chars)
   );
   const chosenCharacter = useRef<Character>(allPictures[0]);
   const [options, setOptions] = useState<Array<Option>>([]);
   const [gameStatus, setGameStatus] = useState("waiting");
-  const [nextTimer, setNextTimer] = useState<number | null>();
-  const [timer, setTimer] = useState<number>(10);
-  const [roundTimer, setRoundTimer] = useState<number>(timer);
+  const [timer, setTimer] = useState<number>(INITALTIME);
   const [gameOver, setGameOver] = useState(false);
   const [answerFeedbackImage, setAnswerFeedbackImage] =
     useState<ANSWERFEEDBACKIMAGE>();
@@ -27,6 +27,23 @@ export default function About({}: Props) {
   function shuffle(list: any) {
     return list.sort((_a: any, _b: any) => 0.5 - Math.random());
   }
+
+  //detect key presses
+  useEffect(() => {
+    const handleKeyDown = (e: { key: any; }) => {
+      const key = e.key;
+      if(!gameOver && gameStatus === 'waiting'){
+        if((key === '1' || key === '2' || key === '3' || key === '4') && options.length !== 0){
+          let opt = options[parseInt(key) - 1]
+          selectOption(opt)
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown,);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [gameOver, gameStatus, options]);
 
   useEffect(() => {
     const initialPrep = () => {
@@ -40,7 +57,7 @@ export default function About({}: Props) {
       let nextCharacter;
       while (opts.length !== 4) {
         nextCharacter = chars[Math.floor(Math.random() * chars.length)].name;
-        if (nextCharacter !== chosenCharacter.current.name) {
+        if (nextCharacter !== opts[0].name) {
           opts.push({ name: nextCharacter, validation: VALIDATION.INCORRECT });
         }
       }
@@ -66,49 +83,22 @@ export default function About({}: Props) {
     }
   }, [allPictures, loading]);
 
-  //wait for the next round
   useEffect(() => {
     let countdown: string | number | NodeJS.Timeout | undefined;
-    if (nextTimer !== null && nextTimer! > 0) {
+    if (gameStatus === "waiting" && timer > 0) {
       countdown = setInterval(() => {
-        setNextTimer(prev => prev! - 1);
+        setTimer(prevTimer => prevTimer - 1);
       }, 1000);
+    } else if (gameStatus === "waiting" && timer === 0) {
+      selectOption({ name: "", validation: VALIDATION.INCORRECT }, true);
+    } else if (gameStatus === "loading" && timer > 0) {
+      countdown = setInterval(() => {
+        setTimer(prevTimer => prevTimer - 1);
+      }, 1000);
+    } else if (gameStatus === "loading" && timer === 0) {
     }
     return () => clearInterval(countdown);
-  }, [nextTimer]);
-
-  //go to the next character
-  const updateList = useCallback(() => {
-    let newList = allPictures.filter(
-      item => item.name !== chosenCharacter.current?.name
-    );
-    setAllPictures(newList);
-  }, [allPictures]);
-
-  useEffect(() => {
-    let countdown: string | number | NodeJS.Timeout | undefined;
-    if (roundTimer !== null && roundTimer! >= 0) {
-      countdown = setInterval(() => {
-        setRoundTimer(prev => prev! - 1);
-        console.log(timer);
-        if (timer == 0) {
-          setGameOver(true);
-        }
-        if (roundTimer == 1) {
-          setGameStatus("loading");
-          setAnswerFeedbackImage(ANSWERFEEDBACKIMAGE.TIMEUP);
-          setTimer(timer - 1);
-          setNextTimer(3);
-          setTimeout(() => {
-            if (!gameOver) {
-              updateList();
-            }
-          }, 3000);
-        }
-      }, 1000);
-    }
-    return () => clearInterval(countdown);
-  }, [roundTimer, timer, gameOver, updateList]);
+  }, [gameOver, gameStatus, timer]);
 
   //prepare the next set of options
   function prepOptions() {
@@ -127,7 +117,7 @@ export default function About({}: Props) {
         nextCharacter =
           allPictures[Math.floor(Math.random() * allPictures.length)].name;
       }
-      if (nextCharacter !== chosenCharacter.current.name) {
+      if (nextCharacter !== opts[0].name) {
         opts.push({ name: nextCharacter, validation: VALIDATION.INCORRECT });
       }
     }
@@ -135,26 +125,35 @@ export default function About({}: Props) {
     setOptions(opts);
   }
 
-  function endRound() {
-    let opt: Option = { name: "", validation: VALIDATION.INCORRECT };
-    selectOption(opt);
+  //update the characters list
+  function updateList() {
+    let newList = allPictures.filter(
+      item => item.name !== chosenCharacter.current?.name
+    );
+    setAllPictures(newList);
   }
 
   //when the user selects an option
-  function selectOption(op: Option) {
+  function selectOption(op: Option, timeup: boolean = false) {
     //if correct
     if (op.validation) {
       setScore(score + 1);
       setAnswerFeedbackImage(ANSWERFEEDBACKIMAGE.CORRECT);
     } else {
-      setTimer(timer - 1);
-      setAnswerFeedbackImage(ANSWERFEEDBACKIMAGE.INCORRECT);
+      // setTimer(timer - 1);
+      setIncorrect(incorrect + 1);
+      if (timeup) {
+        setAnswerFeedbackImage(ANSWERFEEDBACKIMAGE.TIMEUP);
+      } else {
+        setAnswerFeedbackImage(ANSWERFEEDBACKIMAGE.INCORRECT);
+      }
     }
 
     if (gameStatus === "waiting") {
       setGameStatus("loading");
-      if (score + 1 !== WINSCORE) {
-        setNextTimer(3);
+      //check if player reached end score
+      if (score + 1 !== WINSCORE && INITALTIME - incorrect !== 1) {
+        setTimer(3);
         setTimeout(() => {
           if (!gameOver) {
             updateList();
@@ -167,16 +166,16 @@ export default function About({}: Props) {
     }
   }
 
-  function runTimer() {
-    setRoundTimer(timer);
-  }
-
   //when the next image is ready
   function loadedImage() {
-    setGameStatus("waiting");
-    prepOptions();
-    setNextTimer(null);
-    runTimer();
+    //check if player ran out of time
+    if (INITALTIME - incorrect === 0) {
+      setGameOver(true);
+    } else {
+      setGameStatus("waiting");
+      prepOptions();
+      setTimer(INITALTIME - incorrect);
+    }
   }
 
   if (loading) {
@@ -189,19 +188,15 @@ export default function About({}: Props) {
       {!gameOver ? (
         <div className="flex flex-col items-center">
           <div className="flex space-y-14 flex-col items-center">
-            {nextTimer !== null ? (
+            {gameStatus === "loading" ? (
               <div className="text-white font-semibold text-2xl">
-                {!gameOver ? (
-                  <h1>
-                    Next Round in <span>{nextTimer}s</span>
-                  </h1>
-                ) : (
-                  <h1>Game Over!</h1>
-                )}
+                <h1>
+                  Next Round in <span>{timer}s</span>
+                </h1>
               </div>
             ) : (
               <div className="text-white font-semibold text-2xl">
-                Timer: {roundTimer}s
+                Timer: {timer}s
               </div>
             )}
             <div className="text-white font-semibold text-2xl">
@@ -220,7 +215,7 @@ export default function About({}: Props) {
                     className={`object-contain ${
                       gameStatus === "waiting" && "blur-md"
                     } `}
-                    onLoadingComplete={() => loadedImage()}
+                    onLoad={() => loadedImage()}
                     priority
                     fill
                     alt="characterImage"
@@ -232,11 +227,11 @@ export default function About({}: Props) {
           </div>
 
           <div className="flex space-x-5">
-            {options.map(op => (
+            {options.map((op, index) => (
               <button
                 onClick={() => selectOption(op)}
                 type="button"
-                key={op.name}
+                key={index}
                 disabled={gameStatus === "loading"}
                 className={`optionBtn ${
                   gameStatus === "waiting"
@@ -274,18 +269,21 @@ export default function About({}: Props) {
           <div className="font-bold text-4xl text-center border-b-2 border-b-slate-800 mb-8">
             GAME OVER
           </div>
-          <div className="flex-1">
-            <div className="text-xl">Final Score: {score}/25</div>
+          <div className="flex flex-col flex-1 justify-center items-center text-2xl">
+            <div>{score === WINSCORE ? "You Win!" : "You Lose!"}</div>
+            <div>Final Score: {score}/25</div>
           </div>
 
           <div className="flex w-full mt-12">
             <button
+              onClick={() => (window.location.href = "/")}
               type="button"
               className="flex-1 bg-white-800/30 text-slate-400 px-8 py-5 rounded-3xl border-slate-400 border-4 font-bold text-3xl"
             >
               Go Home
             </button>
             <button
+              onClick={() => window.location.reload()}
               type="button"
               className="flex-1 bg-blue-800/30 text-slate-100 px-8 py-5 rounded-3xl border-slate-100 border-4 font-bold text-3xl"
             >

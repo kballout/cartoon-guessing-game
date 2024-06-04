@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .optionBtn {
-    @apply text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl hover:brightness-125 disabled:brightness-200
+    @apply text-white px-8 py-5 rounded-3xl whitespace-nowrap border-white border-4 font-bold text-3xl hover:brightness-125 disabled:brightness-200
 }
