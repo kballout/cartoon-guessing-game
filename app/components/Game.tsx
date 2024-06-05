@@ -63,7 +63,7 @@ const Game: React.FC = () => {
         if (roundTimer > 0 && !gameOver) {
             roundTimerId = setTimeout(() => {
                 setRoundTimer(roundTimer - 1);
-                console.log('in round timer countdown');
+
             }, 1000); // Decrease by 1 every 1000 milliseconds (1 second)
         } else if (roundTimer === 0 && !gameOver && gameStatus === GAMESTATUS.WAITINGINPUT) {
             handleRoundAnswer(null); // Incorrect answer if time runs out
