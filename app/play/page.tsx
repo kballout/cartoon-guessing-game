@@ -6,7 +6,7 @@ import { Character, Option, VALIDATION, ANSWERFEEDBACKIMAGE } from "../types";
 
 type Props = {};
 
-export default function About({}: Props) {
+export default function Play({}: Props) {
   const WINSCORE = 25;
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -186,8 +186,7 @@ export default function About({}: Props) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="text-white font-bold text-5xl">Cartoon Guessing Game</div>
-      {!gameOver ? (
-        <div className="flex flex-col items-center">
+
           <div className="flex space-y-14 flex-col items-center">
             {nextTimer !== null ? (
               <div className="text-white font-semibold text-2xl">
@@ -266,10 +265,11 @@ export default function About({}: Props) {
               />
             )}
           </div>
-        </div>
-      ) : (
+
         <div
-          className={`absolute bg-white/90 w-1/2 h-5/6 rounded-lg px-8 py-6 flex flex-col`}
+          className={`absolute bg-white/90 w-1/2 h-5/6 rounded-lg px-8 py-6 flex flex-col ${
+            !gameOver && "hidden"
+          }`}
         >
           <div className="font-bold text-4xl text-center border-b-2 border-b-slate-800 mb-8">
             GAME OVER
@@ -293,7 +293,7 @@ export default function About({}: Props) {
             </button>
           </div>
         </div>
-      )}
+
     </main>
   );
 }
