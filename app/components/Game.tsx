@@ -44,6 +44,7 @@ const Game: React.FC = () => {
     const [usedCharacters, setUsedCharacters] = useState<number[]>([]);
     const [isCharacterBlurred, setIsCharacterBlurred] = useState(false);
     const [answerFeedbackImage, setAnswerFeedbackImage] = useState<ANSWERFEEDBACKIMAGE | null>();
+    const [won, setWon] = useState(false);
 
     useEffect(() => {
         startGame();
@@ -163,10 +164,10 @@ const Game: React.FC = () => {
             }
         }
 
-        if (round < gameOptions.totalRounds && timerPenalty + 1 < gameOptions.roundTimer) {
+        if (round < gameOptions.totalRounds && timerPenalty <= gameOptions.roundTimer) {
             setNextRoundTimer(gameOptions.timeBetweenRounds);
         } else {
-            endGame(score >= gameOptions.totalRounds); // End game after 25 rounds
+            endGame(timerPenalty <= gameOptions.roundTimer && score > 0); // End game after 25 rounds
         }
     };
 
@@ -191,6 +192,7 @@ const Game: React.FC = () => {
         setRoundTimer(0);
         setGameStatus(GAMESTATUS.GAMEOVER)
         setGameOver(true);
+        setWon(didWin);
     };
 
 
@@ -282,7 +284,7 @@ const Game: React.FC = () => {
                         GAME OVER
                     </div>
                     <div className="flex-1">
-                        <div className="text-xl text-center"><p>You {score >= 25 ? "won" : "lost"} with a score of {score}.</p></div>
+                        <div className="text-xl text-center"><p>You {won ? "won" : "lost"} with a score of {score}.</p></div>
                     </div>
 
                     <div className="flex w-full mt-12">
