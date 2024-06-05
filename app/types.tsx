@@ -3,6 +3,13 @@ export type Character = {
     path: string
 }
 
+export type CharacterType = {
+  name: string,
+  path: string,
+  correct: boolean
+  // any other properties you might need for characters
+}
+
 export enum VALIDATION {
     "INCORRECT",
     "CORRECT",
@@ -18,4 +25,11 @@ export enum ANSWERFEEDBACKIMAGE {
 export type Option = {
     name: string,
     validation: VALIDATION
+}
+
+export enum GAMESTATUS {
+  "LOADING",
+  "WAITINGINPUT",
+  "LOADINGNEXTROUND",
+  "GAMEOVER",
 }
