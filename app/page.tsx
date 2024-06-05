@@ -19,7 +19,7 @@ export default function Home() {
 
       <div>
 
-        <a href="/play" className="bg-blue-800/30 text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl">
+        <a href="/new-play" className="bg-blue-800/30 text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl hover:brightness-125">
           Start Game
         </a>
 
