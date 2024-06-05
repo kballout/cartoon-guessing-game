@@ -14,8 +14,9 @@ export default function Game() {
     timeBetweenRounds: 3,
     round: 1,
     gameOver: false,
-    totalRounds: 25,
+    totalRounds: 50,
   };
+  const WINSCORE = 25
   const [gameStatus, setGameStatus] = useState<GAMESTATUS>(GAMESTATUS.LOADING);
   const [score, setScore] = useState(gameOptions.scoreStart);
   const [round, setRound] = useState(gameOptions.round);
@@ -175,13 +176,18 @@ export default function Game() {
       }
     }
 
-    if (
-      round < gameOptions.totalRounds &&
-      timerPenalty <= gameOptions.roundTimer
-    ) {
-      setRoundTimer(gameOptions.timeBetweenRounds);
+    //check if player won
+    if(isCorrect && (score + 1) === WINSCORE){
+      endGame(true)
     } else {
-      endGame(timerPenalty <= gameOptions.roundTimer && score > 0); // End game after 25 rounds
+      if (
+        round < gameOptions.totalRounds &&
+        timerPenalty <= gameOptions.roundTimer
+      ) {
+        setRoundTimer(gameOptions.timeBetweenRounds);
+      } else {
+        endGame(timerPenalty <= gameOptions.roundTimer && score > 0); // End game after 25 rounds
+      }
     }
   };
 
