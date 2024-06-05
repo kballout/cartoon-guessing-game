@@ -25,7 +25,7 @@ interface CharacterData {
 const Game: React.FC = () => {
     const gameOptions = {
         'scoreStart': 0,
-        'roundTimer': 19,
+        'roundTimer': 10,
         'timerPenalty': 0,
         'timeBetweenRounds': 3,
         'round': 1,
@@ -43,7 +43,7 @@ const Game: React.FC = () => {
     const [selectedChoices, setSelectedChoices] = useState<CharacterData[]>([]);
     const [usedCharacters, setUsedCharacters] = useState<number[]>([]);
     const [isCharacterBlurred, setIsCharacterBlurred] = useState(false);
-    const [answerFeedbackImage, setAnswerFeedbackImage] = useState<ANSWERFEEDBACKIMAGE|null>();
+    const [answerFeedbackImage, setAnswerFeedbackImage] = useState<ANSWERFEEDBACKIMAGE | null>();
 
     useEffect(() => {
         startGame();
@@ -122,22 +122,24 @@ const Game: React.FC = () => {
         const selectedCharacterWithCorrect: CharacterData = {
             ...selectedCharacter,
             correct: true, // Add the 'correct' property
-          };
+        };
         setSelectedCharacter(selectedCharacterWithCorrect);
-        setUsedCharacters([...usedCharacters, randomIndex]);
+        setUsedCharacters(prevUsedCharacters => [...prevUsedCharacters, characterData.indexOf(selectedCharacter)]);
+
+
 
         const incorrectChoices: CharacterData[] = [];
-        const usedNames = new Set([selectedCharacter.name]);
+        const usedNames = new Set([selectedCharacterWithCorrect.name]);
         while (incorrectChoices.length < 3) {
             const randomIndex = Math.floor(Math.random() * characterData.length);
             const choice = characterData[randomIndex];
-            const choiceWithCorrect: CharacterData = {
-                ...choice,
-                correct: false, // Add the 'correct' property
-              };
-            if (!usedNames.has(choiceWithCorrect.name) && choiceWithCorrect !== selectedCharacter) {
+            if (!usedNames.has(choice.name) && choice !== selectedCharacterWithCorrect) {
+                const choiceWithCorrect: CharacterData = {
+                    ...choice,
+                    correct: false
+                }
                 incorrectChoices.push(choiceWithCorrect);
-                usedNames.add(choiceWithCorrect.name);
+                usedNames.add(choice.name);
             }
         }
 
@@ -161,7 +163,7 @@ const Game: React.FC = () => {
             }
         }
 
-        if (round < gameOptions.totalRounds && timerPenalty+1 < gameOptions.roundTimer) {
+        if (round < gameOptions.totalRounds && timerPenalty + 1 < gameOptions.roundTimer) {
             setNextRoundTimer(gameOptions.timeBetweenRounds);
         } else {
             endGame(score >= gameOptions.totalRounds); // End game after 25 rounds
@@ -200,18 +202,19 @@ const Game: React.FC = () => {
     }
 
     return (
-        <div className="flex space-y-14 flex-col items-center justify-between flex-1">
+        <div className="flex flex-col items-center justify-between flex-1">
             <div className="flex space-y-14 flex-col items-center">
 
                 <div className="text-white font-semibold text-2xl">
                     {nextRoundTimer != 0 ? (
                         <div>
                             <p>Next Round In: {nextRoundTimer}s</p>
+                            <p>&nbsp;</p>
                         </div>
                     ) : (
                         <div>
                             <p>Timer: {roundTimer}s</p>
-                            <p>Timer Penalty: -{timerPenalty}s</p>
+                            <p>Timer Penalty: {timerPenalty}s</p>
                         </div>
                     )}
                 </div>
@@ -230,21 +233,20 @@ const Game: React.FC = () => {
                     <Character character={selectedCharacter} isBlurred={isCharacterBlurred} />
                 )}
 
-<div
-                className={`absolute flex items-center justify-center ${
-                    gameStatus !== GAMESTATUS.LOADINGNEXTROUND && "hidden"
-                }`}
-            >
-                {answerFeedbackImage && (
-                    <Image
-                        src={answerFeedbackImage}
-                        className="w-auto h-[256px]"
-                        alt=""
-                        width={100}
-                        height={100}
-                    />
-                )}
-            </div>
+                <div
+                    className={`absolute flex items-center justify-center ${gameStatus !== GAMESTATUS.LOADINGNEXTROUND && "hidden"
+                        }`}
+                >
+                    {answerFeedbackImage && (
+                        <Image
+                            src={answerFeedbackImage}
+                            className="w-auto h-[256px]"
+                            alt=""
+                            width={100}
+                            height={100}
+                        />
+                    )}
+                </div>
 
             </div>
 
@@ -253,13 +255,12 @@ const Game: React.FC = () => {
                 {selectedChoices.map((choice, index) => (
                     <button
                         key={index}
-                        className={`optionBtn ${
-                            gameStatus === GAMESTATUS.WAITINGINPUT
-                              ? "bg-blue-800/30"
-                              : choice.correct
-                              ? "bg-green-800"
-                              : "bg-red-800"
-                          }`}
+                        className={`optionBtn ${gameStatus === GAMESTATUS.WAITINGINPUT
+                            ? "bg-blue-800/30"
+                            : choice.correct
+                                ? "bg-green-800"
+                                : "bg-red-800"
+                            }`}
                         onClick={() => handleRoundAnswer(choice.name === selectedCharacter?.name)}>
                         {choice.name}
                     </button>
@@ -272,33 +273,35 @@ const Game: React.FC = () => {
 
 
             {gameOver && (
-            <div
-                className={`absolute bg-white/90 w-1/2 rounded-lg px-8 py-6 flex flex-col ${!gameOver && "hidden"
-                    }`}
-            >
-                <div className="font-bold text-4xl text-center border-b-2 border-b-slate-800 mb-8">
-                    GAME OVER
-                </div>
-                <div className="flex-1">
-                    <div className="text-xl text-center"><p>You {score >= 25 ? "won" : "lost"} with a score of {score}.</p></div>
+
+                <div
+                    className={`absolute bg-white/90 w-1/2 rounded-lg px-8 py-6 flex flex-col ${!gameOver && "hidden"
+                        }`}
+                >
+                    <div className="font-bold text-4xl text-center border-b-2 border-b-slate-800 mb-8">
+                        GAME OVER
+                    </div>
+                    <div className="flex-1">
+                        <div className="text-xl text-center"><p>You {score >= 25 ? "won" : "lost"} with a score of {score}.</p></div>
+                    </div>
+
+                    <div className="flex w-full mt-12">
+                        <a
+                            href="/"
+                            className="text-center flex-1 bg-white-800/30 text-slate-400 px-8 py-5 rounded-3xl border-slate-400 border-4 font-bold text-3xl"
+                        >
+                            Go Home
+                        </a>
+                        <button
+                            type="button"
+                            onClick={(() => startGame())}
+                            className="flex-1 bg-blue-800/30 text-slate-100 px-8 py-5 rounded-3xl border-slate-100 border-4 font-bold text-3xl"
+                        >
+                            Play Again
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex w-full mt-12">
-                    <a
-                        href="/"
-                        className="text-center flex-1 bg-white-800/30 text-slate-400 px-8 py-5 rounded-3xl border-slate-400 border-4 font-bold text-3xl"
-                    >
-                        Go Home
-                    </a>
-                    <button
-                        type="button"
-                        onClick={(() => startGame())}
-                        className="flex-1 bg-blue-800/30 text-slate-100 px-8 py-5 rounded-3xl border-slate-100 border-4 font-bold text-3xl"
-                    >
-                        Play Again
-                    </button>
-                </div>
-            </div>
             )}
         </div>
     );
