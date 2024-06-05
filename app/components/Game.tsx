@@ -25,9 +25,9 @@ interface CharacterData {
 const Game: React.FC = () => {
     const gameOptions = {
         'scoreStart': 0,
-        'roundTimer': 2,
+        'roundTimer': 19,
         'timerPenalty': 0,
-        'timeBetweenRounds': 2,
+        'timeBetweenRounds': 3,
         'round': 1,
         'gameOver': false,
         'totalRounds': 25,
@@ -284,14 +284,15 @@ const Game: React.FC = () => {
                 </div>
 
                 <div className="flex w-full mt-12">
-                    <button
-                        type="button"
-                        className="flex-1 bg-white-800/30 text-slate-400 px-8 py-5 rounded-3xl border-slate-400 border-4 font-bold text-3xl"
+                    <a
+                        href="/"
+                        className="text-center flex-1 bg-white-800/30 text-slate-400 px-8 py-5 rounded-3xl border-slate-400 border-4 font-bold text-3xl"
                     >
                         Go Home
-                    </button>
+                    </a>
                     <button
                         type="button"
+                        onClick={(() => startGame())}
                         className="flex-1 bg-blue-800/30 text-slate-100 px-8 py-5 rounded-3xl border-slate-100 border-4 font-bold text-3xl"
                     >
                         Play Again
