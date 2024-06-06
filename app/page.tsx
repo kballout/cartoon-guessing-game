@@ -11,7 +11,6 @@ export default function Home() {
       <div className="border-4 border-blue-800 min-h-24 rounded-2xl px-5 py-2">
         <p className="text-white font-bold text-xl border-b mb-4">Game Rules</p>
         <ol className="text-white font-semibold text-lg list-decimal ml-4">
-          <li>There will be a total of 50 rounds in a game</li>
           <li>The initial timer will begin by giving you 10 seconds to answer</li>
           <li>An incorrect answer or no answer will result in a time penalty of 1 second</li>
           <li>Selecting the correct answer for each round will earn you 1 point</li>
