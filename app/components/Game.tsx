@@ -227,10 +227,10 @@ export default function Game() {
                 <p>Timer Penalty: {timerPenalty}s</p>
               </div>
             </div>
-            <div className="text-white font-semibold text-2xl">
+            <div className="text-white font-semibold text-2xl text-center">
               <p>Current Score: {score}</p>
               <p>
-                Round: {round} / {gameOptions.totalRounds}
+                Round: {round}
               </p>
             </div>
           </div>
