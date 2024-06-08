@@ -7,29 +7,31 @@ import Image from "next/image";
 import { ANSWERFEEDBACKIMAGE, CharacterType, GAMESTATUS } from "../types";
 
 export default function Game() {
+    // initialization data
   const gameOptions = {
-    scoreStart: 0,
-    roundTimer: 10,
-    timerPenalty: 0,
-    timeBetweenRounds: 3,
-    round: 1,
-    gameOver: false,
-    totalRounds: 50,
+    scoreStart: 0, //score for the start of a game
+    roundTimer: 10, // time in seconds allowed for each round
+    timerPenalty: 0, // starting time penalty in seconds
+    timeBetweenRounds: 3, // amount of time in seconds for between round
+    round: 1, // Keep track of what round we are on
+    gameOver: false, //is the game over?
+    totalRounds: 50, // total allowed rounds per game
+    winScore: 25 // how many points you need to win the game
   };
-  const WINSCORE = 25
-  const [gameStatus, setGameStatus] = useState<GAMESTATUS>(GAMESTATUS.LOADING);
-  const [score, setScore] = useState(gameOptions.scoreStart);
-  const [round, setRound] = useState(gameOptions.round);
-  const [roundTimer, setRoundTimer] = useState(gameOptions.roundTimer);
-  const [timerPenalty, setTimerPenalty] = useState(gameOptions.timerPenalty);
-  const [gameOver, setGameOver] = useState(false);
+
+  const [gameStatus, setGameStatus] = useState<GAMESTATUS>(GAMESTATUS.LOADING); // current status of the game
+  const [score, setScore] = useState(gameOptions.scoreStart); // current score
+  const [round, setRound] = useState(gameOptions.round); // current round
+  const [roundTimer, setRoundTimer] = useState(gameOptions.roundTimer); // current timer of the round in seconds
+  const [timerPenalty, setTimerPenalty] = useState(gameOptions.timerPenalty); // What the current timer penalty is
+  const [gameOver, setGameOver] = useState(false); // is the game over?
   const [selectedCharacter, setSelectedCharacter] =
-    useState<CharacterType | null>(null);
-  const [selectedChoices, setSelectedChoices] = useState<CharacterType[]>([]);
-  const [usedCharacters, setUsedCharacters] = useState<number[]>([]);
+    useState<CharacterType | null>(null); // what character is being displayed for the round
+  const [selectedChoices, setSelectedChoices] = useState<CharacterType[]>([]); // what are the choices of incorrect characters to display in the round
+  const [usedCharacters, setUsedCharacters] = useState<number[]>([]); // what characters have been used for the rounds so we don't duplicate
   const [answerFeedbackImage, setAnswerFeedbackImage] =
-    useState<ANSWERFEEDBACKIMAGE | null>();
-  const [won, setWon] = useState(false);
+    useState<ANSWERFEEDBACKIMAGE | null>(); // the image to show after selection is made determining if it is correct, incorrect, or time up
+  const [won, setWon] = useState(false); // Did the current player win?
 
   //starting the game
   useEffect(() => {
@@ -117,6 +119,7 @@ export default function Game() {
     };
   }, [gameOver, gameStatus, selectedCharacter?.name, selectedChoices]);
 
+  // select the current character for the round and other incorrect answers
   const selectCharacterAndChoices = () => {
     const availableCharacters = characterData.filter(
       (_, index) => !usedCharacters.includes(index)
@@ -162,6 +165,7 @@ export default function Game() {
     setSelectedChoices(allChoices);
   };
 
+  // called when the user selects their answer
   const handleRoundAnswer = (isCorrect: boolean | null) => {
     setGameStatus(GAMESTATUS.LOADINGNEXTROUND);
     if (isCorrect) {
@@ -177,7 +181,7 @@ export default function Game() {
     }
 
     //check if player won
-    if(isCorrect && (score + 1) === WINSCORE){
+    if(isCorrect && (score + 1) === gameOptions.winScore){
       endGame(true)
     } else {
       if (
@@ -191,6 +195,7 @@ export default function Game() {
     }
   };
 
+  // prepare for the next round
   const handleNextRound = () => {
     setAnswerFeedbackImage(null);
     setRound(round + 1);
@@ -198,6 +203,7 @@ export default function Game() {
     setGameStatus(GAMESTATUS.WAITINGINPUT);
   };
 
+  // handle the end of game state
   const endGame = (didWin: boolean) => {
     setRoundTimer(0);
     setGameStatus(GAMESTATUS.GAMEOVER);
