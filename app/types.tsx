@@ -1,8 +1,3 @@
-export type Character = {
-    name: string,
-    path: string
-}
-
 export type CharacterType = {
   name: string,
   path: string,
