@@ -5,6 +5,7 @@ import characterData from "../../characters.json";
 import Character from "./Character";
 import Image from "next/image";
 import { ANSWERFEEDBACKIMAGE, CharacterType, GAMESTATUS } from "../types";
+import Link from "next/link";
 
 export default function Game() {
     // initialization data
@@ -315,12 +316,12 @@ export default function Game() {
           </div>
 
           <div className="flex w-full mt-12">
-            <a
+            <Link
               href="/"
               className="text-center flex-1 bg-white-800/30 text-slate-400 px-8 py-5 rounded-3xl border-slate-400 border-4 font-bold text-3xl"
             >
               Go Home
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => window.location.reload()}
