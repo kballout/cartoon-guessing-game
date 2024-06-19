@@ -1,5 +1,5 @@
 "use client"
-
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -21,14 +21,14 @@ export default function Home() {
           <ol className="text-white font-semibold text-lg list-decimal ml-4">
             <li>Answer 25 correct questions to win the game</li>
             <li>If you fail 10 questions the timer will be set to 0 and you will lose the game</li>
-          </ol>        
+          </ol>
       </div>
 
       <div>
 
-        <a href="/play" className="bg-blue-800/30 text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl hover:brightness-125">
+        <Link href="/play" className="bg-blue-800/30 text-white px-8 py-5 rounded-3xl border-white border-4 font-bold text-3xl hover:brightness-125">
           Start Game
-        </a>
+        </Link>
 
       </div>
     </main>
