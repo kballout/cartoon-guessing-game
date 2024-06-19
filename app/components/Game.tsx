@@ -271,7 +271,7 @@ export default function Game() {
             </div>
           </div>
 
-          <div className="flex space-x-5 flex-end">
+          <div className="flex space-x-5 flex-end md:flex-col">
             {selectedChoices.map((choice, index) => (
               <button
                 key={index}
